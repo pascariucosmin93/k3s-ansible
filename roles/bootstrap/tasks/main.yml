@@ -4,6 +4,11 @@
     name: sudo
     state: present
 
+- name: Configure hostname when provided
+  ansible.builtin.hostname:
+    name: "{{ vm_hostname }}"
+  when: vm_hostname | length > 0
+
 - name: Ensure admin user exists
   ansible.builtin.user:
     name: "{{ vm_admin_user }}"
@@ -29,3 +34,4 @@
     group: root
     mode: "0440"
     validate: "visudo -cf %s"
+  when: vm_enable_passwordless_sudo

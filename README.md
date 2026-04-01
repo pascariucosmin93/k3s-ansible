@@ -1,34 +1,42 @@
 # k3s-ansible
 
-Ansible repo for preparing a fresh Ubuntu VM and installing `k3s`.
+Ansible project for preparing an Ubuntu VM and installing a single-node `k3s` cluster.
 
-It covers the two steps you described:
+This repo is designed as a compact infrastructure layer for a personal cluster, lab environment, or GitOps demo target.
+
+It covers both phases:
 
 1. VM bootstrap
-2. `k3s` install
+2. `k3s` installation and base configuration
 
-## What it does
+## Features
 
-The bootstrap playbook prepares a clean VM by:
+The bootstrap flow handles:
 
-- running `apt update` and `apt upgrade`
-- installing common CLI packages
-- creating an admin user
-- adding that user to `sudo`
-- configuring passwordless sudo
-- installing Docker
+- package update and upgrade
+- CLI tooling for administration
+- hostname configuration
+- admin user creation
+- passwordless sudo setup
+- Docker installation
+- optional `qemu-guest-agent`
+- optional UFW firewall setup
 
-The `k3s` playbook:
+The `k3s` flow handles:
 
-- creates `/etc/rancher/k3s/config.yaml`
-- installs `k3s`
-- enables and starts the service
-- supports extra API server args through `k3s_kube_apiserver_args`
+- rendering `/etc/rancher/k3s/config.yaml`
+- installing the `k3s` server
+- enabling and starting the `k3s` service
+- optional cluster token support
+- optional `cluster-init`
+- disabling bundled components such as Traefik
+- readable kubeconfig on the target VM
 
 ## Structure
 
 ```text
 .
+├── .gitignore
 ├── ansible.cfg
 ├── group_vars/
 ├── inventory/
@@ -37,7 +45,17 @@ The `k3s` playbook:
 └── roles/
 ```
 
-## Quick start
+## Repository layout
+
+- `playbooks/bootstrap.yml` prepares the VM
+- `playbooks/k3s.yml` installs and configures `k3s`
+- `playbooks/site.yml` runs the full flow
+- `roles/common` manages package maintenance, timezone, firewall and guest agent
+- `roles/bootstrap` manages hostname, admin user and sudoers
+- `roles/docker` installs Docker
+- `roles/k3s` installs and configures the cluster service
+
+## Quick Start
 
 Install collections:
 
@@ -56,24 +74,33 @@ Edit shared vars in `group_vars/all.yml`:
 
 ```yaml
 ansible_user: ubuntu
+vm_hostname: vm-rui
 vm_admin_user: cosmin
 vm_admin_ssh_keys:
   - ssh-ed25519 AAAA...
+k3s_disable:
+  - traefik
 ```
 
-Run bootstrap:
+Run only the VM bootstrap:
 
 ```bash
 ansible-playbook playbooks/bootstrap.yml
 ```
 
-Install k3s:
+Install `k3s` on the prepared VM:
 
 ```bash
 ansible-playbook playbooks/k3s.yml
 ```
 
-## Typical flow
+Or run the full flow:
+
+```bash
+ansible-playbook playbooks/site.yml
+```
+
+## Typical Flow
 
 Use this order on a fresh VM:
 
@@ -82,7 +109,7 @@ Use this order on a fresh VM:
 3. reconnect with the new admin user if you want
 4. run `k3s.yml`
 
-## Example result
+## Example Outcome
 
 After both playbooks finish, the VM should have:
 
@@ -90,10 +117,15 @@ After both playbooks finish, the VM should have:
 - a dedicated admin user with passwordless sudo
 - Docker installed and running
 - `k3s` installed and started
+- a generated kubeconfig under `/etc/rancher/k3s/k3s.yaml`
+
+## Notes
+
+- This repository is intentionally scoped for a single-node `k3s` setup suitable for portfolio demos and small labs.
+- If you want HA or agent nodes later, this structure is a good base to extend with separate host groups and roles.
+- The VM bootstrap tasks stay close to `vm-bootstrap-ansible` so both repositories look consistent in your portfolio.
 
 ## Push to GitHub
-
-If you created the repo locally:
 
 ```bash
 git init
