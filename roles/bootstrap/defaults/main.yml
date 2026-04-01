@@ -1,0 +1,6 @@
+---
+vm_admin_user: devops
+vm_admin_groups:
+  - sudo
+vm_admin_shell: /bin/bash
+vm_admin_ssh_keys: []

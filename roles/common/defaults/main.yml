@@ -1,0 +1,5 @@
+---
+bootstrap_common_packages: []
+bootstrap_upgrade_packages: true
+bootstrap_reboot_after_upgrade: false
+bootstrap_timezone: UTC

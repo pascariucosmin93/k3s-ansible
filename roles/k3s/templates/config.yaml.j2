@@ -1,0 +1,19 @@
+write-kubeconfig-mode: "0644"
+{% if k3s_disable | length > 0 %}
+disable:
+{% for item in k3s_disable %}
+  - {{ item }}
+{% endfor %}
+{% endif %}
+{% if k3s_node_labels | length > 0 %}
+node-label:
+{% for item in k3s_node_labels %}
+  - {{ item }}
+{% endfor %}
+{% endif %}
+{% if k3s_kube_apiserver_args | length > 0 %}
+kube-apiserver-arg:
+{% for item in k3s_kube_apiserver_args %}
+  - {{ item }}
+{% endfor %}
+{% endif %}

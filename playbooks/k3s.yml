@@ -1,0 +1,6 @@
+---
+- name: Install k3s on target VM
+  hosts: k3s
+  become: true
+  roles:
+    - k3s

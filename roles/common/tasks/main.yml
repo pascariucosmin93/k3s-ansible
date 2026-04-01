@@ -1,0 +1,28 @@
+---
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Upgrade installed packages
+  ansible.builtin.apt:
+    upgrade: dist
+  when: bootstrap_upgrade_packages
+
+- name: Install common packages
+  ansible.builtin.apt:
+    name: "{{ bootstrap_common_packages }}"
+    state: present
+  when: bootstrap_common_packages | length > 0
+
+- name: Configure timezone
+  community.general.timezone:
+    name: "{{ bootstrap_timezone }}"
+
+- name: Reboot after package upgrade when requested
+  ansible.builtin.reboot:
+    msg: Reboot triggered by Ansible after package upgrades
+    reboot_timeout: 900
+  when:
+    - bootstrap_upgrade_packages
+    - bootstrap_reboot_after_upgrade

@@ -1,0 +1,8 @@
+---
+- name: Prepare VM for DevOps workloads
+  hosts: k3s
+  become: true
+  roles:
+    - common
+    - bootstrap
+    - docker

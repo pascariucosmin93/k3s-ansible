@@ -1,0 +1,5 @@
+---
+k3s_kube_apiserver_args: []
+k3s_disable: []
+k3s_node_labels: []
+k3s_env: {}
